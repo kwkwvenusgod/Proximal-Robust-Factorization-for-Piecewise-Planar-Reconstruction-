@@ -216,12 +216,12 @@ end;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Initializations
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% if (options.verbose)
-%     fprintf('\nStarting RANSAC');
-%     if (options.fix_seed)
-%         fprintf(' [random number generator seed is fixed]');
-%     end;
-% end;
+if (options.verbose)
+    fprintf('\nStarting RANSAC');
+    if (options.fix_seed)
+        fprintf(' [random number generator seed is fixed]');
+    end;
+end;
 
 % start timer
 tic;
@@ -232,9 +232,9 @@ if isempty(options.parameters)
 else
     [~, k] = feval(options.est_fun, [], [], options.parameters);
 end
-% if (options.verbose)
-%     fprintf('\nMinimal sample set dimension = %d', k);
-% end;
+if (options.verbose)
+    fprintf('\nMinimal sample set dimension = %d', k);
+end;
 
 % total number of elements
 N = size(X, 2);
@@ -262,15 +262,15 @@ if ~isfield(options, 'T_noise_squared')
     end;
 
     options.T_noise_squared = T_noise_squared;
-%     if (options.verbose)
-%         fprintf('\nSquared noise threshold = %f, (assuming Gaussian noise, for sigma = %f)', T_noise_squared, options.sigma);
-%     end;
+    if (options.verbose)
+        fprintf('\nSquared noise threshold = %f, (assuming Gaussian noise, for sigma = %f)', T_noise_squared, options.sigma);
+    end;
 else
     % set a hard noise threshold
     T_noise_squared = options.T_noise_squared;
-%     if (options.verbose)
-%         fprintf('\nSquared noise threshold = %f', T_noise_squared);
-%     end;
+    if (options.verbose)
+        fprintf('\nSquared noise threshold = %f', T_noise_squared);
+    end;
 end;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -403,12 +403,12 @@ while (...
 
     if (options.verbose)
 
-%         if ( update_T_iter || update_sets || notify )
-% 
-%             fprintf('\nIteration = %5d/%9d. ', iter, T_iter);
-%             fprintf('Inliers = %6d/%6d (rank is r = %8.8f)', N_I_star, N, r_star);
-% 
-%         end;
+        if ( update_T_iter || update_sets || notify )
+
+            fprintf('\nIteration = %5d/%9d. ', iter, T_iter);
+            fprintf('Inliers = %6d/%6d (rank is r = %8.8f)', N_I_star, N, r_star);
+
+        end;
 
     end;
 
@@ -422,9 +422,9 @@ end;
 % Reestimation --------------------------------------------------------
 if (options.reestimate)
     
-%     if (options.verbose)
-%         fprintf('\nRestimating the parameter vector... ')
-%     end;
+    if (options.verbose)
+        fprintf('\nRestimating the parameter vector... ')
+    end;
     
     if isempty(options.parameters)
         Theta_star = feval(options.est_fun, X(:, CS_star), []);
@@ -435,9 +435,9 @@ if (options.reestimate)
     [E_star, CS_star] = get_consensus_set(X, Theta_star, T_noise_squared, options.man_fun, options.parameters);
     r_star = get_consensus_set_rank(CS_star, E_star, options.mode, T_noise_squared);
     
-%     if (options.verbose)
-%         fprintf('Done')
-%     end;
+    if (options.verbose)
+        fprintf('Done')
+    end;
     
 end;
 
@@ -453,13 +453,13 @@ if (options.stabilize)
     results = stabilize(X, results, options);
 end
 
-% if (options.verbose)
-%     fprintf('\nFinal number of inliers = %d/%d', sum(results.CS), N);
-% end;
+if (options.verbose)
+    fprintf('\nFinal number of inliers = %d/%d', sum(results.CS), N);
+end;
 
 results.time = toc;
-% if (options.verbose)
-%     fprintf('\nConverged in %d iterations (%f seconds)\n', iter, results.time);
-% end;
+if (options.verbose)
+    fprintf('\nConverged in %d iterations (%f seconds)\n', iter, results.time);
+end;
 
 return;
