@@ -137,9 +137,9 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 cvx_ver = '2.1';
-cvx_bld = '1110';
-cvx_bdate = 'Wed Jun 10 21:43:38 2015';
-cvx_bcomm = '66e9a9c';
+cvx_bld = '1116';
+cvx_bdate = 'Thu Mar 30 21:54:11 2017';
+cvx_bcomm = 'd4cc5c5';
 line = '---------------------------------------------------------------------------';
 fprintf( '\n%s\n', line );
 fprintf( 'CVX: Software for Disciplined Convex Programming       (c)2014 CVX Research\n' );
@@ -432,6 +432,6 @@ if fs ~= '/',
 end
 newman = newman(:);
 
-% Copyright 2005-2014 CVX Research, Inc.
+% Copyright 2005-2016 CVX Research, Inc.
 % See the file LICENSE.txt for full copyright information.
 % The command 'cvx_where' will show where this file is located.
