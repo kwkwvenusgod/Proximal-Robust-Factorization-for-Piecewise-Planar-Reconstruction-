@@ -1,0 +1,10 @@
+function [ output_args ] = Evaluate_Normal( norm_gt, normal_est)
+%EVALUATE_NORMAL Summary of this function goes here
+%   Detailed explanation goes here
+normal_est_normalize = normal_est/norm(normal_est);
+cos_similarity = norm_gt' * normal_est_normalize;
+
+angular_
+
+end
+

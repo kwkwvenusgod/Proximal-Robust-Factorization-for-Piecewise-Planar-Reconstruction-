@@ -41,10 +41,10 @@ end
 
 coeff_A=sparse(row_w,col_w,Uk_weighted,6*F*P,36*P);
 b=reshape(WeightedM,6*F*P,1);
-
+CoeffSceneCons=0.5*1e1;
 cvx_begin
     variable x(36*P)
-    minimize( norm( coeff_A * x -b, 2 ) +CoeffSceneCons*norm(plane_similarity_constraint*x,1)+CoeffSceneCons*norm(depth_similarity_constraint*x,2))
+    minimize( norm( coeff_A * x - b, 2 ) +CoeffSceneCons*norm(plane_similarity_constraint*x,1)+CoeffSceneCons*norm(depth_similarity_constraint*x,2))
     subject to
         cons_A * x == value_a
         cons_B * x == value_b

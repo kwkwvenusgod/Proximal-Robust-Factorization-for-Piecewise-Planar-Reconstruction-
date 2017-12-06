@@ -31,7 +31,7 @@ lmax=3;
 lambda=1e-6;
 Wk_tmp=reshape(Wk,m,n);
 
-depth=Calc_depth(V,focal,label_set,label_map);
+depth=Calc_Depth(V,focal,label_set,label_map);
 
 s_depth=depth./abs(depth+eps);
 s_depth(find(s_depth<0))=0;
@@ -53,10 +53,10 @@ smoothness_normalxz=sparse(row,col,patch_similarity(ind),36*length(label_set),36
 col=col+12*ones(length(col),1);
 row=row+12*ones(length(row),1);
 smoothness_normalyz=sparse(row,col,patch_similarity(ind),36*length(label_set),36*length(label_set));
-plane_similarity_constraint = [smoothness_Z0/focal^1.4;smoothness_normalxz;smoothness_normalyz];
+plane_similarity_constraint = [smoothness_Z0/focal^1.65;smoothness_normalxz;smoothness_normalyz];
 
 %calc depth constraint
-depth_similarity_constraint =  Construct_Depth_Constraint_In_Patch( label_map, uv, uvback ,patch_similarity,imageref, label_map_full )/focal^1.3;
+depth_similarity_constraint =  Construct_Depth_Constraint_In_Patch( label_map, uv, uvback ,patch_similarity,imageref, label_map_full )/focal^1.475;
 
 
 count=1;
@@ -76,7 +76,7 @@ while ~converged
     %refine step
     beta2=beta2*1.02;
     WeightME=(M(mask)-Ek).*flowconfidencW(mask);
-    [ Wk_new1 ,  Nk1, C1, normWk1 ] = refine_M( WeightME, Wk,r,Nk*C, mask, beta1, U, V_new, beta2, flowconfidencW(:));
+    [ Wk_new1 ,  Nk1, C1, normWk1 ] = Refine_M( WeightME, Wk,r,Nk*C, mask, beta1, U, V_new, beta2, flowconfidencW(:));
     
     %update U
     tmpW=reshape(Wk_new1,m,n);
@@ -107,8 +107,7 @@ while ~converged
     U=U_new;
     V=V_new;
     iter=iter+1;
-    depth=Calc_depth(V,focal,label_set,label_map);
-    normal=Calc_Normal(V,focal);
+    depth=Calc_Depth(V,focal,label_set,label_map);
     
     s_depth=depth./abs(depth+eps);
     s_depth(find(s_depth<0))=0;

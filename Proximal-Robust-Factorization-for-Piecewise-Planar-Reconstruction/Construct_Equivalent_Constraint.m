@@ -18,7 +18,7 @@ base_A(5, 1) = 1; base_A(5, 15) = focal_len;
 for i = 1:n_patches
     Cons_A((i-1)*n_eq+1:i*n_eq, (i-1)*n_entry+1: i*n_entry) = base_A;
 end
-Value_a = zeros(n_entry* n_patches,1);
+Value_a = zeros(n_patches*n_eq,1);
 %%
 Cons_B=sparse(eye(n_entry*n_patches));
 diag_ind=1:n_entry:n_entry*n_patches;

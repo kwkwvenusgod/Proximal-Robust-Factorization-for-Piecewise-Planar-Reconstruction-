@@ -1,4 +1,4 @@
-function [ sceneCons_weighted,sceneCons ] = Construct_Patch_Similarity( flowf,flowb, correspondence , imageref)
+function [ patch_similarity,patch_clique ] = Construct_Patch_Similarity( flowf,flowb, correspondence , imageref)
 %SCENE_CONSTRAINT Summary of this function goes here
 %   Detailed explanation goes here
 [H,W]=size(correspondence);
@@ -102,7 +102,6 @@ simlarity=exp(simlarity1+simlarity2);
 simlarity(find(simlarity<0.05*1e-1))=0;
 
 overoccluded=Check_Occlussions(flowf,flowb);
-figure, imshow(overoccluded,[])
 
 borders=is_border_valsIMPORT(double(reshape(correspondence, [H,W])));
 se=strel('square',3);
@@ -163,18 +162,18 @@ for i=1:length(label)
 end
 
 simlarity=simlarity.*neighbour_structure_occlusion.*neighbour_structure_enlarge;
-sceneCons_weighted=simlarity;
+patch_similarity=simlarity;
 ind_diag=sub2ind([length(label),length(label)],[1:length(label)]',[1:length(label)]');
-sceneCons_weighted(ind_diag)=-sum(simlarity,2);
+patch_similarity(ind_diag)=-sum(simlarity,2);
 %treat the neighbour equal importance
-sceneCons=zeros(size(sceneCons_weighted));
-for i=1:size(sceneCons_weighted,1)
+patch_clique=zeros(size(patch_similarity));
+for i=1:size(patch_similarity,1)
     indtmp=find(simlarity(:,i));
     if isempty(indtmp)==0
-        tmpvec=zeros(size(sceneCons_weighted,1),1);
+        tmpvec=zeros(size(patch_similarity,1),1);
         tmpvec(indtmp)=-1;
-        sceneCons(:,i)=tmpvec;
-        sceneCons(i,i)=length(indtmp);
+        patch_clique(:,i)=tmpvec;
+        patch_clique(i,i)=length(indtmp);
     end
 end
 end
