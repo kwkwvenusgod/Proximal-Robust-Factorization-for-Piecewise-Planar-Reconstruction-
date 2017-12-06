@@ -1,4 +1,4 @@
-function [ depth, nagetivelabel,new_label_map,label_set_new] = Calc_depth(structure_matrix,focal_len,label_set, label_map  )
+function [ depth, nagetivelabel,new_label_map,label_set_new] = Calc_Depth(structure_matrix,focal_len,label_set, label_map  )
 %CAL_DEPTH Summary of this function goes here
 %   Detailed explanation goes here
 depth_inv=structure_matrix(1,1:6:size(structure_matrix,2))/focal_len;
