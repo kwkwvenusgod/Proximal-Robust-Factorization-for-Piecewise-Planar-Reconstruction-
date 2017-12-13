@@ -1,4 +1,37 @@
-function [sp_labels] = TSP(K, root, files, dispOn)
+function [sp_labels] = TSP(K, root, files, dispOn, frames)
+%TSP Temporal Superpixel Segmentation.
+%   SP_LABELS = TSP(K, ROOT, FILES) returns the label matrix in time and
+%   space for the video volume in UINT32. K is the (approximate) number of
+%   superpixels per frame. ROOT is the directory to the frames. FILES is a
+%   list of the frame images, typically obtained using
+%      FILES = dir([ROOT '*.jpg']);
+%
+%   SP_LABELS = TSP(K, ROOT, FILES, DISPON) supplies an additional flag to
+%   display the progress of the algorithm while processing. If omitted or
+%   empty, DISPON defaults to true.
+%
+%   SP_LABELS = TSP(K, ROOT, FILES, DISPON, FRAMES) supplies an additional
+%   variable that indicates which frames to process. FRAMES should be in
+%   the format of STARTFRAME:ENDFRAME. If omitted or empty, FRAMES defaults
+%   to 1:NUMFRAMES.
+
+%   Notes: This version of the code does not reestimate the flow between
+%   frames. As noted in the paper, the flow estimation does not do much. If
+%   you desire to reestimate the flow, set params.reestimateFlow to be
+%   true.
+%
+%   All work using this code should cite:
+%   J. Chang, D. Wei, and J. W. Fisher III. A Video Representation Using
+%      Temporal Superpixels. CVPR 2013.
+%
+%   Written by Jason Chang and Donglai Wei 2013/06/20
+
+% add the necessary paths
+addpath('gui/');
+addpath('mex/');
+addpath('util/');
+
+
 params.cov_var_p = 1000;
 params.cov_var_a = 100;
 params.area_var = 400;
@@ -19,49 +52,35 @@ if (~exist(root_flows,'dir'))
     mkdir(root_flows);
 end
 
-save_path=[root,'/seg'];
-if (~exist(save_path,'dir'))
-    mkdir(save_path);
-end
-
 disp('Precomputing all the optical flows...');
-
 for f=2:numel(files)
-    tic
     im1 = imread(fullfile(root,files(f-1).name));
     im2 = imread(fullfile(root,files(f).name));
-       
-    for tt=1:3
-        im1(:,:,tt)=medfilt2(im1(:,:,tt));
-        im2(:,:,tt)=medfilt2(im2(:,:,tt));
-    end
-   
     outname = fullfile(root_flows,[files(f).name(1:end-4) '_flow.mat']);
     disp([' -> ' outname]);
     compute_of(im1,im2,outname);
-    toc
 end
 disp(' -> Optical flow calculations done');    
 
 
 flow_files = dir([root_flows '*_flow.mat']);
-frames = 1:numel(files);
+
+if (~exist('frames','var') || isempty(frames))
+    frames = 1:numel(files);
+else
+    frames(frames>numel(files)) = [];
+end
 oim = imread([root files(1).name]);
 sp_labels = zeros(size(oim,1), size(oim,2), numel(frames), 'uint32');
 frame_it = 0;
 
 disp('Staring Segmentation');
-
 for f=frames
- tic
     disp([' -> Frame '  num2str(f) ' / ' num2str(numel(frames))]);
 
     frame_it = frame_it + 1;
     oim1 = imread([root files(f).name]);
-    for tt=1:3
-        oim1(:,:,tt)=medfilt2(oim1(:,:,tt));
-    end
-    
+
     if (frame_it==1)
         IMG = IMG_init(oim1, params);
     else
@@ -73,16 +92,6 @@ for f=frames
 
         vx = -flow.bvx;
         vy = -flow.bvy;
-%          vx=flow(:,:,1);
-%          vy=flow(:,:,2);
-%         compute the realability of optical flow
-        uv(:,:,1)=vx;
-        uv(:,:,2)=vy;
-        
-        reliable=VisualizeLocalReliability(uv);
-   
-%         figure,imshow(reliable,[]);
-%         figure,imshow(uv(:,:,1).*uv(:,:,1)+uv(:,:,2).*uv(:,:,2),[]);
         IMG = IMG_prop(oim1,vy,vx,IMG);
     end
 
@@ -95,7 +104,7 @@ for f=frames
     IMG.Sxy = [];
     IMG.Syy = [];
     converged = false;
-    while (~converged && it<30 && true && frame_it==1)
+    while (~converged && it<5 && true && frame_it==1)
         it = it + 1;
 
         oldK = IMG.K;
@@ -134,7 +143,7 @@ for f=frames
     IMG.SP_changed(:) = true;
     IMG.alive_dead_changed = true;
 
-    while (~converged )
+    while (~converged && it<20)
         it = it + 1;
         times = zeros(1,5);
 
@@ -156,12 +165,11 @@ for f=frames
 
         E(end+1) = newE;
         converged = ~any(~arrayfun(@(x)(isempty(x{1})), {IMG.SP(:).N}) & IMG.SP_changed(1:IMG.K));
-        im_path1=[save_path,'/label',int2str(f),'.jpg'];
+
         if (dispOn)
             sfigure(1);
             im = zeros(size(oim));
             imagesc(IMG.label);
-            saveas(gcf,im_path1);
             title([num2str(it) ' - ' num2str(numel(unique(IMG.label)))]);
 
             sfigure(2);
@@ -180,12 +188,8 @@ for f=frames
         SP_UID{m} = -1;
     end
     sp_labels(:,:,frame_it) = reshape([SP_UID{IMG.label(IMG.w+1:end-IMG.w,IMG.w+1:end-IMG.w) +1}], size(oim,1), size(oim,2));
-%     figure,imshow(sp_labels(:,:,frame_it),[]);
-    im_path=[save_path,'/seg',int2str(f),'.jpg'];
-    imwrite(im,im_path,'jpg');
-toc
-end
 
+end
 
 
 

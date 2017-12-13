@@ -1,15 +1,30 @@
-clc;
-mex -Igsl/include -Lgsl/lib -lgsl -lcblas -O is_border_valsIMPORT.cpp
-mex -Igsl/include -Lgsl/lib -lgsl -lcblas -O random_initIMPORT.cpp
-mex -Igsl/include -Lgsl/lib -lgsl -lcblas -O populate_indices.cpp
-mex -Igsl/include -Lgsl/lib -lgsl -lcblas -O SP_prop_init.cpp
+% The following variable links to the GSL libraries.
+% On linux, this is probably not needed.
+if (ismac)
+    GSL_DIR = ' -I/usr/local/include/ -L/usr/local/lib/ ';
+else
+    GSL_DIR = '';
+end
+
+% TSP MEX functions
+
+cd mex;
+
+mex -O is_border_valsIMPORT.cpp
+mex -O random_initIMPORT.cpp
+mex -O populate_indices.cpp
+mex -O SP_prop_init.cpp
+
+eval(['mex ' GSL_DIR '-O localonly_move.cpp IMG.cpp NormalD.cpp SP.cpp -lgsl -lgslcblas -lm -lpthread']);
+eval(['mex ' GSL_DIR '-O local_move.cpp IMG.cpp NormalD.cpp SP.cpp -lgsl -lgslcblas -lm -lpthread']);
+eval(['mex ' GSL_DIR '-O switch_move.cpp IMG.cpp NormalD.cpp SP.cpp -lgsl -lgslcblas -lm -lpthread']);
+eval(['mex ' GSL_DIR '-O merge_move.cpp IMG.cpp NormalD.cpp SP.cpp -lgsl -lgslcblas -lm -lpthread']);
+eval(['mex ' GSL_DIR '-O split_move.cpp IMG.cpp NormalD.cpp SP.cpp -lgsl -lgslcblas -lm -lpthread']);
+
+cd ..;
+
+% optical flow
 
 cd optical_flow_celiu/mex/
-mex -O Coarse2FineTwoFrames.cpp GaussianPyramid.cpp OpticalFlow.cpp
+mex -O Coarse2FineTwoFrames.cpp OpticalFlow.cpp GaussianPyramid.cpp
 cd ../../
-
-mex -Igsl/include -Lgsl/lib -lgsl -lcblas -O localonly_move.cpp IMG.cpp NormalD.cpp SP.cpp;
-mex -Igsl/include -Lgsl/lib -lgsl -lcblas -O local_move.cpp IMG.cpp NormalD.cpp SP.cpp;
-mex -Igsl/include -Lgsl/lib -lgsl -lcblas -O switch_move.cpp IMG.cpp NormalD.cpp SP.cpp;
-mex -Igsl/include -Lgsl/lib -lgsl -lcblas -O merge_move.cpp IMG.cpp NormalD.cpp SP.cpp;
-mex -Igsl/include -Lgsl/lib -lgsl -lcblas -O split_move.cpp IMG.cpp NormalD.cpp SP.cpp;

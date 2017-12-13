@@ -1,12 +1,13 @@
-data_name = 'chesstable';
+data_name = 'chessboardforward';
 data_path = ['.\data\', data_name,'\'];
 focal_length = 356.2500;
 %% process superpixel segments
-n_seg = 180;
+n_seg = 300;
 seg_path = [data_path, 'labels_',data_name ,'_K', num2str(n_seg), '.mat'];
 segs = load(seg_path);
 segs = segs.sp_labels;
 consistent_label_segs = Find_Correspondences(segs);
+label_map = segs(:,:,1);
 label_ref = consistent_label_segs(:,:,1);
 %% load flow
 flowl2r_path = [data_path, 'flow_', data_name, 'l2r.mat'];
@@ -52,6 +53,10 @@ N0 = ceil(size(W_ini(:),1)*0.6);
 %% optimization
 [ Wr_cvx,Er_cvx,N_cvx, Ur_cvx, Vr_cvx]...
     = Plane_Factorization( patch_flow_rank4, mask, r, N0,W_ini, E_ini ,focal_length, label_map_consistent, label_set , label_ref ,image_ref ,patch_confidence_map,uv,uvback );
+%% visualization
+[ Depth_map ] = Depth_Completion( label_map, label_map_consistent, Vr_cvx, focal_length  );
+
+
 %% load ground truth 
 gt_path = ['.\groundtruth\', data_name];
 translation_gt_path = [gt_path, '\Translation_Para.mat'];
@@ -65,7 +70,7 @@ rotations_gt=struct2cell(rotations_gt);
 [ translation_error, translation_error_average, rotation_angular_error,rotation_angular_error_average, rotation_epe, rotation_epe_average] = Evaluation_Motion( motion_gt, Ur_cvx );
 %% Evaluation normal
 mask_path = ['.\data\', data_name,'\mask.jpg'];
-mask = imread(mask_path);
+mask_checkerboard = imread(mask_path);
 normal_map = Calc_Normal(Vr_cvx, focal_length);
-checkerboard_normal =  Calc_Checkerboard_Normal( normal_map,mask, label_map_consistent, label_set );
+checkerboard_normal =  Calc_Checkerboard_Normal( normal_map,mask_checkerboard, label_map_consistent, label_set );
 checkerboard_normal_erro = Evaluate_Normal( normal_gt, checkerboard_normal);

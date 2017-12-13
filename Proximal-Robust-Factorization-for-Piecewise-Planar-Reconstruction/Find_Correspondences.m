@@ -19,10 +19,12 @@ for count=1:length(stat)
         end
     end
 end
-d_ll=unique(d_l);
-for i=1:length(d_ll)
-    pos=find(stat==d_ll(i));
-    stat(pos)=[];
+if exist('d_l','var') ~= 0
+    d_ll=unique(d_l);
+    for i=1:length(d_ll)
+        pos=find(stat==d_ll(i));
+        stat(pos)=[];
+    end
 end
 
 for i=1:numofframes
