@@ -1,8 +1,8 @@
-data_name = 'chessboardforward';
+data_name = 'checkerboxlateral';
 data_path = ['.\data\', data_name,'\'];
 focal_length = 356.2500;
 %% process superpixel segments
-n_seg = 300;
+n_seg = 180;
 seg_path = [data_path, 'labels_',data_name ,'_K', num2str(n_seg), '.mat'];
 segs = load(seg_path);
 segs = segs.sp_labels;
@@ -55,7 +55,7 @@ N0 = ceil(size(W_ini(:),1)*0.6);
     = Plane_Factorization( patch_flow_rank4, mask, r, N0,W_ini, E_ini ,focal_length, label_map_consistent, label_set , label_ref ,image_ref ,patch_confidence_map,uv,uvback );
 %% visualization
 [ Depth_map ] = Depth_Completion( label_map, label_map_consistent, Vr_cvx, focal_length  );
-
+ Visualization_3D( image_ref,Depth_map,focal_length )
 
 %% load ground truth 
 gt_path = ['.\groundtruth\', data_name];

@@ -3,7 +3,7 @@
 if (ismac)
     GSL_DIR = ' -I/usr/local/include/ -L/usr/local/lib/ ';
 else
-    GSL_DIR = '';
+    GSL_DIR = 'C:\cygwin64\usr\include';
 end
 
 % TSP MEX functions
@@ -20,8 +20,8 @@ eval(['mex ' GSL_DIR '-O local_move.cpp IMG.cpp NormalD.cpp SP.cpp -lgsl -lgslcb
 eval(['mex ' GSL_DIR '-O switch_move.cpp IMG.cpp NormalD.cpp SP.cpp -lgsl -lgslcblas -lm -lpthread']);
 eval(['mex ' GSL_DIR '-O merge_move.cpp IMG.cpp NormalD.cpp SP.cpp -lgsl -lgslcblas -lm -lpthread']);
 eval(['mex ' GSL_DIR '-O split_move.cpp IMG.cpp NormalD.cpp SP.cpp -lgsl -lgslcblas -lm -lpthread']);
-
-cd ..;
+% 
+ cd ..;
 
 % optical flow
 
